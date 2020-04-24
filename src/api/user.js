@@ -11,13 +11,14 @@ export const login = data => {
 
 // 获取用户资料
 export const getUserProfile = () => {
+  // const user = JSON.parse(window.localStorage.getItem('user'))
   return request({
     method: 'GET',
-    url: '/mp/v1_0/user/profile',
+    url: '/mp/v1_0/user/profile'
     // 后端要求把需要授权的用户身份放到请求头中
     // axios可以通过headers选项设置请求头
-    headers: {
-      Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTkwMDAxNzUsInVzZXJfaWQiOjEsInJlZnJlc2giOmZhbHNlLCJ2ZXJpZmllZCI6dHJ1ZX0.NpP5Nb0C5OHU6PHmvCsndhFCfQslVAhtXhgYzyiYQvM'
-    }
+    // headers: {
+    //   Authorization: `Bearer ${user.token}`
+    // }
   })
 }

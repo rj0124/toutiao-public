@@ -103,8 +103,7 @@ export default {
       this.loginLoading = true
 
       login(this.user).then(res => {
-        console.log(res)
-
+        // console.log(res)
         // 登录成功
         this.$message({
           message: '登录成功',
@@ -113,6 +112,11 @@ export default {
 
         // 关闭 loading
         this.loginLoading = false
+
+        // 将接口返回的用户相关的数据放在本地存储,方便应用
+        // 本地存储只能存字符串
+        window.localStorage.setItem('user', JSON.stringify(res.data.data))
+
         // 跳转到首页
         this.$router.push({
           name: 'home'
