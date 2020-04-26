@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Login from '@/views/login/'
 import Home from '@/views/home/'
 import Layout from '@/views/layout/'
+import Article from '@/views/article/'
 
 Vue.use(VueRouter)
 
@@ -25,6 +26,11 @@ const routes = [
         // 可以用路由的名字找到该路由
         name: 'home',
         component: Home
+      },
+      {
+        path: '/article',
+        name: 'article',
+        component: Article
       }
     ]
   }
