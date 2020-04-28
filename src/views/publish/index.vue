@@ -8,12 +8,13 @@
           <el-breadcrumb-item>{{ $route.query.id ? '修改文章' : '发布文章' }}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
-      <el-form ref="form" :model="article" label-width="40px">
-        <el-form-item label="标题">
+      <el-form ref="publish-form" :model="article" :rules="formRules" label-width="60px">
+        <el-form-item label="标题" prop="title">
           <el-input v-model="article.title"></el-input>
         </el-form-item>
-        <el-form-item label="内容">
-          <el-input type="textarea" v-model="article.content"></el-input>
+        <el-form-item label="内容" prop="content">
+          <!-- <el-input type="textarea" v-model="article.content"></el-input> -->
+          <el-tiptap placeholder="请输入文章内容" height="300px" v-model="article.content" :extensions="extensions"></el-tiptap>
         </el-form-item>
         <el-form-item label="封面">
           <el-radio-group v-model="article.cover.type">
@@ -23,7 +24,7 @@
             <el-radio :label="-1">自动</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="频道">
+        <el-form-item label="频道" prop="channel_id">
           <el-select v-model="article.channel_id" placeholder="请选择频道">
             <el-option v-for="(channel, index) in channels" :key="index" :label="channel.name" :value="channel.id"></el-option>
           </el-select>
@@ -38,10 +39,36 @@
 </template>
 <script>
 import { getArticleChannels, addArticle, updateArticle, getArticle } from '@/api/article'
+import 'element-tiptap/lib/index.css'
+import {
+  ElementTiptap,
+  Doc,
+  Text,
+  Paragraph,
+  Heading,
+  Bold,
+  Underline,
+  Italic,
+  Image,
+  Strike,
+  ListItem,
+  BulletList,
+  OrderedList,
+  TodoItem,
+  TodoList,
+  HorizontalRule,
+  Fullscreen,
+  Preview,
+  CodeBlock,
+  TextColor
+} from 'element-tiptap'
+import { uploadImage } from '@/api/image'
 
 export default {
   name: 'publishIndex',
-  components: {},
+  components: {
+    'el-tiptap': ElementTiptap
+  },
   props: {},
   data () {
     return {
@@ -54,6 +81,58 @@ export default {
           images: [] // 封面图片的地址
         },
         channel_id: null
+      },
+      extensions: [
+        new Doc(),
+        new Text(),
+        new Paragraph(),
+        new Heading({ level: 5 }),
+        new Bold({ bubble: true }), // 在气泡菜单中渲染菜单按钮
+        new Underline(), // 下划线
+        new Italic(), // 斜体
+        new Image({
+          // 自定义图片上传
+          uploadRequest (file) {
+            const fd = new FormData()
+            fd.append('image', file)
+            return uploadImage(fd).then(res => {
+              return res.data.data.url
+            })
+          }
+        }),
+        new Strike(), // 删除线
+        new ListItem(),
+        new BulletList(), // 无序列表
+        new OrderedList(), // 有序列表
+        new TodoItem(),
+        new TodoList(),
+        new HorizontalRule(),
+        new Fullscreen(),
+        new Preview(),
+        new CodeBlock(),
+        new TextColor()
+      ],
+      formRules: {
+        title: [
+          { required: true, message: '请输入文章标题', trigger: 'blue' },
+          { min: 5, max: '30', message: '长度在5到30个字符', trigger: 'blue' }
+        ],
+        content: [
+          // { required: true, message: '请输入文章标题', trigger: 'change' }
+          {
+            validator (rule, value, callback) {
+              if (value === '<p></p>') {
+                callback(new Error('请输入文章内容'))
+              } else {
+                callback()
+              }
+            }
+          },
+          { required: true, message: '请输入文章内容', trigger: 'blue' }
+        ],
+        channel_id: [
+          { required: true, message: '请输入文章频道' }
+        ]
       }
     }
   },
@@ -77,31 +156,36 @@ export default {
       })
     },
     onPublish (draft = false) {
-      // 找到数据接口
-      // 封装请求方法
-      // 请求提交表单
-      // 如果是编辑文章,则执行修改操作
-      const articleId = this.$route.query.id
-      if (this.$route.query.id) {
-        updateArticle(articleId, this.article, draft).then(res => {
-          this.$message({
-            message: `${draft ? '存入草稿' : '发布'}成功`,
-            type: 'success'
+      this.$refs['publish-form'].validate(valid => {
+        if (!valid) {
+          return
+        }
+        // 找到数据接口
+        // 封装请求方法
+        // 请求提交表单
+        // 如果是编辑文章,则执行修改操作
+        const articleId = this.$route.query.id
+        if (this.$route.query.id) {
+          updateArticle(articleId, this.article, draft).then(res => {
+            this.$message({
+              message: `${draft ? '存入草稿' : '发布'}成功`,
+              type: 'success'
+            })
+            // 跳转到内容管理页面
+            this.$router.push('/article')
           })
-          // 跳转到内容管理页面
-          this.$router.push('/article')
-        })
-      } else {
-        addArticle(this.article, draft).then(res => {
-          console.log(res)
-          this.$message({
-            message: `${draft ? '存入草稿' : '发布'}成功`,
-            type: 'success'
+        } else {
+          addArticle(this.article, draft).then(res => {
+            console.log(res)
+            this.$message({
+              message: `${draft ? '存入草稿' : '发布'}成功`,
+              type: 'success'
+            })
+            // 跳转到内容管理页面
+            this.$router.push('/article')
           })
-          // 跳转到内容管理页面
-          this.$router.push('/article')
-        })
-      }
+        }
+      })
       // 处理响应结果
     },
 

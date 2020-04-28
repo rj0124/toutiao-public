@@ -61,6 +61,6 @@ export default {
   .logo {
     width: 80%;
     height: 40px;
-    margin: 10px 0;
+    margin: 15px 12px 0 12px;
   }
 </style>
