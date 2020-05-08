@@ -223,7 +223,7 @@ export default {
     },
 
     onPublish (draft = false) {
-      this.$refs['publish-form'].validate(valid => {
+      this.$refs['publish-form'].validate(async valid => {
         // 验证失败，停止提交表单
         if (!valid) {
           return
@@ -237,27 +237,25 @@ export default {
         const articleId = this.$route.query.id
         if (articleId) {
           // 执行修改操作
-          updateArticle(articleId, this.article, draft).then(res => {
-            console.log(res)
-            this.$message({
-              message: `${draft ? '存入草稿' : '发布'}成功`,
-              type: 'success'
-            })
-            // 跳转到内容管理页面
-            this.$router.push('/article')
+          const res = await updateArticle(articleId, this.article, draft)
+          console.log(res)
+          this.$message({
+            message: `${draft ? '存入草稿' : '发布'}成功`,
+            type: 'success'
           })
-        } else {
-          addArticle(this.article, draft).then(res => {
-            // 处理响应结果
-            // console.log(res)
-            this.$message({
-              message: `${draft ? '存入草稿' : '发布'}成功`,
-              type: 'success'
-            })
-            // 跳转到内容管理页面
-            this.$router.push('/article')
-          })
+          // 跳转到内容管理页面
+          this.$router.push('/article')
+          return
         }
+        const res = await addArticle(this.article, draft)
+        // 处理响应结果
+        // console.log(res)
+        this.$message({
+          message: `${draft ? '存入草稿' : '发布'}成功`,
+          type: 'success'
+        })
+        // 跳转到内容管理页面
+        this.$router.push('/article')
       })
     },
 

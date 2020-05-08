@@ -1,14 +1,27 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '@/views/login/'
-import Home from '@/views/home/'
-import Layout from '@/views/layout/'
-import Article from '@/views/article/'
-import Publish from '@/views/publish/'
-import Image from '@/views/image/'
-import Comment from '@/views/comment/'
-import Settings from '@/views/settings/'
-import Fans from '@/views/fans/'
+
+const Login = () => import('@/views/login/')
+const Home = () => import(/* webpackChunkName: "group-foo" */ '@/views/home/')
+const Layout = () => import('@/views/layout/')
+const Article = () => import(/* webpackChunkName: "group-foo" */ '@/views/article/')
+const Publish = () => import('@/views/publish/')
+const Image = () => import(/* webpackChunkName: "group-foo" */ '@/views/image/')
+const Comment = () => import('@/views/comment/')
+const Settings = () => import('@/views/settings/')
+const Fans = () => import('@/views/fans/')
+
+// import Vue from 'vue'
+// import VueRouter from 'vue-router'
+// import Login from '@/views/login/'
+// import Home from '@/views/home/'
+// import Layout from '@/views/layout/'
+// import Article from '@/views/article/'
+// import Publish from '@/views/publish/'
+// import Image from '@/views/image/'
+// import Comment from '@/views/comment/'
+// import Settings from '@/views/settings/'
+// import Fans from '@/views/fans/'
 
 Vue.use(VueRouter)
 

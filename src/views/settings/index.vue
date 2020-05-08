@@ -104,23 +104,22 @@ export default {
   },
   mounted () {},
   methods: {
-    onUpdateUser () {
+    async onUpdateUser () {
       // 表单验证
       this.updateUserProfileLoading = true
       const { name, intro, email } = this.user
-      updateUserProfile({
+      const res = await updateUserProfile({
         name,
         intro,
         email
-      }).then(res => {
-        this.$message({
-          type: 'success',
-          message: '保存成功'
-        })
-        this.updateUserProfileLoading = false
-        // 发布通知
-        globalBus.$emit('update-user', this.user)
       })
+      this.$message({
+        type: 'success',
+        message: '保存成功'
+      })
+      this.updateUserProfileLoading = false
+      // 发布通知
+      globalBus.$emit('update-user', this.user)
     },
     loadUser () {
       getUserProfile().then(res => {
@@ -159,28 +158,33 @@ export default {
       // this.cropper.destroy()
     },
 
-    onUpdatePhoto () {
-      this.updatePhotoLoading = true
-      // 获取裁切的图片对象
-      this.cropper.getCroppedCanvas().toBlob(file => {
-        const fd = new FormData()
-        fd.append('photo', file)
-        // 请求更新用户头像
-        updateUserPhoto(fd).then(res => {
-        // 关闭对话框
-          this.dialogVisible = false
-          // 更新视图展示
-          // this.user.photo = res.data.data.photo
-          this.user.photo = window.URL.createObjectURL(file)
-
-          this.updatePhotoLoading = false
-          this.$message({
-            type: 'success',
-            message: '更新头像成功'
-          })
-          globalBus.$$emit('update-user', this.user)
+    getCroppendCanvas () {
+      return new Promise((resolve, reject) => {
+        this.cropper.getCroppendCanvas().toBlob(file => {
+          resolve(file)
         })
       })
+    },
+
+    async onUpdatePhoto () {
+      this.updatePhotoLoading = true
+      // 获取裁切的图片对象
+      const file = await this.getCroppendCanvas()
+      const fd = new FormData()
+      fd.append('photo', file)
+      // 请求更新用户头像
+      updateUserPhoto(fd)
+      // 关闭对话框
+      this.dialogVisible = false
+      // 更新视图展示
+      // this.user.photo = res.data.data.photo
+      this.user.photo = window.URL.createObjectURL(file)
+      this.updatePhotoLoading = false
+      this.$message({
+        type: 'success',
+        message: '更新头像成功'
+      })
+      globalBus.$$emit('update-user', this.user)
     }
   }
 }

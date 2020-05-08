@@ -98,11 +98,13 @@ export default {
       // 验证通过，提交登录
     },
 
-    login () {
-      // 开启登陆中 loading...
+    async login () {
+    // 开启登陆中 loading...
       this.loginLoading = true
 
-      login(this.user).then(res => {
+      try {
+        const res = await login(this.user)
+
         // console.log(res)
         // 登录成功
         this.$message({
@@ -112,23 +114,52 @@ export default {
 
         // 关闭 loading
         this.loginLoading = false
-
         // 将接口返回的用户相关的数据放在本地存储,方便应用
         // 本地存储只能存字符串
         window.localStorage.setItem('user', JSON.stringify(res.data.data))
-
         // 跳转到首页
         this.$router.push({
           name: 'home'
         })
-      }).catch(err => { // 登录失败
+      } catch (err) {
         console.log('登录失败', err)
         this.$message.error('登录失败，手机号或验证码错误')
 
         // 关闭 loading
         this.loginLoading = false
-      })
+      }
     }
+    // login () {
+    //   // 开启登陆中 loading...
+    //   this.loginLoading = true
+
+    //   login(this.user).then(res => {
+    //     // console.log(res)
+    //     // 登录成功
+    //     this.$message({
+    //       message: '登录成功',
+    //       type: 'success'
+    //     })
+
+    //     // 关闭 loading
+    //     this.loginLoading = false
+
+    //     // 将接口返回的用户相关的数据放在本地存储,方便应用
+    //     // 本地存储只能存字符串
+    //     window.localStorage.setItem('user', JSON.stringify(res.data.data))
+
+    //     // 跳转到首页
+    //     this.$router.push({
+    //       name: 'home'
+    //     })
+    //   }).catch(err => { // 登录失败
+    //     console.log('登录失败', err)
+    //     this.$message.error('登录失败，手机号或验证码错误')
+
+    //     // 关闭 loading
+    //     this.loginLoading = false
+    //   })
+    // }
   }
 }
 </script>
